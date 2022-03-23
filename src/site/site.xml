@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="JSeq">
+
+  <bannerLeft>
+    <href>http://jseq.sourceforge.net</href>
+    <src>jseq.gif</src>
+  </bannerLeft>
+
+  <bannerRight>
+    <href>http://sourceforge.net</href>
+    <src>http://sflogo.sourceforge.net/sflogo.php?group_id=230519&amp;type=7</src>
+  </bannerRight>
+
+  <body>
+
+    <links>
+      <item name="SourceForge" href="http://sourceforge.net/projects/jseq" />
+      <item name="Download" href="http://sourceforge.net/project/showfiles.php?group_id=230519" />
+    </links>
+
+    <menu name="JSeq">
+      <item name="About" href="index.html" />
+      <item name="Screenshots" href="http://sourceforge.net/project/screenshots.php?group_id=230519" />
+      <item name="Download" href="http://sourceforge.net/project/showfiles.php?group_id=230519" />
+      <item name="License" href="license.html" />
+      <item name="Contributors" href="contributors.html" />
+    </menu>
+
+    <menu name="Documentation">
+      <item name="Overview" href="docs/index.html" />
+      <item name="Installation" href="docs/installation.html" />
+      <item name="Tutorial" href="docs/tutorial.html" />
+    </menu>
+
+    <menu name="Project Information">
+      <item name="Dependencies" href="dependencies.html" />
+      <item name="Issue Tracking" href="issue-tracking.html" />
+      <item name="Project Summary" href="project-summary.html" />
+      <item name="Project Team" href="team-list.html" />
+      <item name="Source Repository" href="source-repository.html" />
+    </menu>
+
+    <menu name="Project Reports">
+      <item name="Checkstyle Report" href="checkstyle.html" />
+      <item name="Cobertura Test Coverage" href="cobertura/index.html" />
+      <item name="CPD Report" href="cpd.html" />
+      <item name="FindBugs Report" href="findbugs.html" />
+      <item name="JavaDocs" href="apidocs/index.html" />
+      <item name="JavaNCSS Report" href="javancss.html" />
+      <item name="JDepend Report" href="jdepend-report.html" />
+      <item name="Maven Surefire Report" href="surefire-report.html" />
+      <item name="PMD Report" href="pmd.html" />
+      <item name="Source Xref" href="xref/index.html" />
+      <item name="Tag List" href="taglist.html" />
+      <item name="Test JavaDocs" href="testapidocs/index.html" />
+      <item name="Test Source Xref" href="xref-test/index.html" />
+    </menu>
+
+  </body>
+
+</project>

@@ -1,0 +1,219 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>net.sourceforge.jseq</groupId>
+  <artifactId>jseq</artifactId>
+  <packaging>jar</packaging>
+  <version>0.6</version>
+  <name>JSeq</name>
+  <url>http://jseq.sourceforge.net</url>
+  <description>
+    JSeq is a tool to automatically create UML sequence diagrams. It
+    works by following the execution of a Java program, noting each
+    method entry and exit. It then generates a sequence diagram from
+    this information.
+  </description>
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License</name>
+      <url>http://www.gnu.org/licenses/lgpl-3.0-standalone.html</url>
+      <distribution>repo</distribution>
+    </license>
+    <license>
+      <name>GNU General Public License</name>
+      <url>http://www.gnu.org/licenses/gpl-3.0-standalone.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>Henrik Arro</name>
+      <id>arro01</id>
+      <email>arro01@users.sourceforge.net</email>
+      <roles>
+        <role>Project Lead</role>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Jacek Ratzinger</name>
+      <id>jacek_ratzinger</id>
+      <email>jacek_ratzinger@users.sourceforge.net</email>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+  </developers>
+  <organization>
+    <name>Edge Software, Co., Ltd.</name>
+    <url>http://www.edge.co.th</url>
+  </organization>
+  <issueManagement>
+    <system>Sourceforge</system>
+    <url>http://sourceforge.net/tracker/?group_id=230519</url>
+  </issueManagement>
+  <scm>
+    <connection>
+      scm:svn:http://jseq.svn.sourceforge.net/svnroot/jseq/trunk
+    </connection>
+    <developerConnection>
+      scm:svn:https://jseq.svn.sourceforge.net/svnroot/jseq/trunk
+    </developerConnection>
+    <url>http://jseq.svn.sourceforge.net/viewvc/jseq/</url>
+  </scm>
+
+  <dependencies>
+    <dependency>
+      <groupId>nsuml</groupId>
+      <artifactId>nsuml</artifactId>
+      <version>0.4.20</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.sdedit</groupId>
+      <artifactId>sdedit-light</artifactId>
+      <version>3.1</version>
+    </dependency>
+<!--     <dependency> -->
+<!--       <groupId>sun.jdk</groupId> -->
+<!--       <artifactId>tools</artifactId> -->
+<!--       <version>1.6.0</version> -->
+<!--       <scope>system</scope> -->
+<!--       <systemPath>${java.home}/../lib/tools.jar</systemPath> -->
+<!--     </dependency> -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <target>8</target>
+          <source>8</source>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/Test*.java</exclude>
+            <exclude>
+              ${basedir}/docs/samples/src/test/**/*.java
+            </exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <appendAssemblyId>false</appendAssemblyId>
+          <descriptors>
+            <descriptor>
+              ${basedir}/config/assembly/distribution.xml
+            </descriptor>
+          </descriptors>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attached</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <configLocation>
+            ${basedir}/config/checkstyle/checkstyle.xml
+          </configLocation>
+          <headerLocation>
+            ${basedir}/config/checkstyle/file-header.txt
+          </headerLocation>
+          <propertyExpansion>
+            checkstyle.severity=info
+          </propertyExpansion>
+          <enableRulesSummary>false</enableRulesSummary>
+          <includeTestSourceDirectory>true</includeTestSourceDirectory>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <configuration>
+          <targetJdk>1.5</targetJdk>
+          <rulesets>
+            <ruleset>${basedir}/config/pmd/pmd-rules.xml</ruleset>
+          </rulesets>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+        <configuration>
+          <effort>Max</effort>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jdepend-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>javancss-maven-plugin</artifactId>
+        <version>2.0-beta-2</version>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>taglist-maven-plugin</artifactId>
+        <configuration>
+          <tags>
+            <tag>TODO</tag>
+            <tag>@todo</tag>
+            <tag>FIXME</tag>
+            <tag>XXX</tag>
+          </tags>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
+
+  <distributionManagement>
+    <site>
+      <id>sourceforge.net</id>
+      <url>scp://web.sourceforge.net/home/groups/j/js/jseq/htdocs/</url>
+    </site>
+  </distributionManagement>
+
+</project>

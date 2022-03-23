@@ -1,0 +1,154 @@
+        ---
+        Overview
+        ---
+        Henrik Arro
+        ---
+        2008-10-16
+
+JSeq
+
+        JSeq is a tool for automatically generating sequence diagrams from actual program runs. It can be used stand-alone, or in combination with JUnit.
+
+Prerequisites
+
+ You need the following to use JSeq:
+
+    * Java 1.4. I have only tested with Sun's JDK 1.4.0.
+
+    * A Java virtual machine that supports the Java Platform Debugger Architecture (JPDA). This includes Sun's implementation.
+
+    * A JAXP compliant XML parser, such as {{{http://xml.apache.org/xerces2-j/}Xerces}}.
+
+    * If you want to create ArgoUML diagrams, you need nsuml.jar. If you use ArgoUML, you already have this file. Otherwise, you can download it from {{http://sourceforge.net/projects/nsuml/}}. I have only tested with version 0.4.20.
+
+    * To view diagrams in SVG format, you need an SVG viewer. Adobe has one for download at {{http://www.adobe.com/svg/}}.
+
+        See the {{{installation.html}installation instructions}} for information about how to configure your system to use JSeq.
+
+Using JSeq with JUnit
+
+        To document scenarios in your UML model, you can use JSeq in combination with JUnit. In this case, you create one JUnit test case for each scenario that you want to document; JSeq then automatically creates sequence diagrams for the scenarios, based on the test cases.
+
+        I have not yet created an Ant task for running JSeq. However, this does not have to stop you from using Ant to generate your sequence diagrams. You can use the java task to start JSeq, like so:
+
+---
+<target name="make_diagram" depends="compile_tests">
+  <java fork="yes"
+        classname="th.co.edge.jseq.Main"
+        taskname="JSeq" failonerror="true">
+    <arg line="-format argouml"/>
+    <arg line="-out ${basedir}/scenarios.zargo"/>
+    <arg line="junit.textui.TestRunner"/>
+    <arg line="scenarios.AllScenarios"/>
+    <classpath refid="jseq.class.path"/>
+  </java>
+</target>
+---      
+
+        In the example above, you create an ArgoUML model file called <<<scenarios.zargo>>>, based on the tests in the Java class <<<scenarios.AllScenarios>>>.
+
+        See the {{{tutorial.html}tutorial}} for a hands-on example of how this works.
+
+Running JSeq From the Command Line
+
+        To run JSeq from the command line, you use the jseq script. It can be used in one of three different ways: to start a new program; to attach to a running program; or to generate a new diagram for a previous run.
+
+* Starting a New Program
+
+        To start a new Java program and generate a diagram from the program run, you use
+
+---
+jseq [-options] <class> [args...]
+---
+
+* Attaching to a Running Program
+
+        To attach to a running Java program, you use 
+
+---
+jseq [-options] -attach <address>
+---
+
+        In this case, the Java program must have been started to allow debuggers to attach to it. See the documentation for your Java virtual machine for more information. For Sun's implementation, information can be found in the documentation for jdb.
+
+        <<An example for Sun's Java 2 SDK:>>
+
+        Start your program like this:
+
+---
+java -Xdebug -Xrunjdwp:transport=dt_shmem,address=mytest,server=y,suspend=n MyTestProgram
+---
+
+        Start JSeq and attach to the running program:
+
+---
+jseq -attach mytest
+---
+
+* Generating Diagrams From a Previous Run
+
+        To generate a sequence diagram from a previous run of JSeq, you use
+
+---
+jseq [-options] -read <filename>
+---
+
+        In this case, the file to read should have been saved by an earlier invocation of JSeq, using the -save option.
+
+Command-Line Options
+
+        <<Options for running a program>>
+
+*---+---+
+        <<<-classpath <path\>>>> |	Sets the classpath that JSeq uses when running a program.
+*---
+        <<<-cp <path\>>>> |	Same as <<<-classpath>>>.
+*---
+        <<<-save <filename\>>>> |	Saves the program trace in a file, so that you can generate different diagrams from it without having to run the program again.
+*---+---+
+
+        <<Options for generating sequence diagrams>>
+
+*---+---+
+        <<<-out <filename\>>>> |	Saves the diagram to a file.
+*---
+        <<<-format <format\>>>> |	Generates different types of diagrams. Valid values for <<<<format\>>>>; are <<<argouml>>>, <<<svg>>> and <<<text>>>.
+*---
+        <<<-quiet>>> |	Does not generate any diagram. Useful in combination with <<<-save>>>.
+*---
+        <<<-start <methodname\>>>> |	Generates a program trace and sequence diagram starting with the given method name. Can speed of execution of JSeq.
+*---
+        <<<-exclude <class regexp\>>>> |	Excludes classes matching <<<<class regexp\>>>> when generating the program trace and the diagram. Can speed up execution of JSeq.
+        |
+        |        The <<<<class regexp\>>>> is a simplified regular expression, that must either be an exact match, or start or end with "*". For example, <<<-exclude foo.bar.*>>> and <<<-exclude *.frotz>>> are legal, while <<<-exclude foo.*.frotz>>> is not.
+        |
+        |       You can give more than one <<<-exclude>>> option.
+*---
+        <<<-nostdexcludes>>> |	Does not exclude standard Java classes from the program trace and diagram. By default, the following packages are excluded: <<<java.*>>>, <<<javax.*>>>, <<<sun.*>>>, <<<com.sun.*>>>, <<<junit.*>>>. Please note that if you include all classes, the program trace will normally take a very long time to generate.
+*---+---+
+
+        <<Other options>>
+
+*---+---+
+        <<<-notrace>>> |	Turns off logging of method entries, etc. to <<<System.err>>>. By default, JSeq generates log output to show that is actually working. :-)
+*---
+        <<<-version>>> |	Prints version information to <<<System.out>>> and exits.
+*---+---+
+
+Known Problems
+
+        This is a list of known problems in this version of JSeq.
+
+        * There is only a Windows BAT file to start JSeq, no Unix shell script. The reason is simply that I currently do not have access to any Unix or Linux machine to test this on.
+
+        I have only tested the BAT file on Windows 2000. I know that it will not work on Windows 95/98. I'm not sure about other Windows versions.
+
+        * For ArgoUML diagrams, calls back to the same object are not visible, except for the method name.
+
+        To work around this in JSeq with good results would require duplicating ArgoUML's layout code, something I feel is not a good idea. The proper solution to this problem is to fix ArgoUML.
+
+        * For ArgoUML diagrams, the method name for calls back to the same object appear in the wrong place.
+
+        Luckily, you just have to click on one of the method names in the diagram to fix this.
+
+        * For ArgoUML diagrams, the multiplicity of repeated method calls, e.g., <<<*[2]>>>, is not shown.

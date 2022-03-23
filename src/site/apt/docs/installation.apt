@@ -1,0 +1,20 @@
+        ---
+        Installation
+        ---
+        Henrik Arro
+        ---
+        2008-10-16
+
+        This document contains short instructions for configuring your system so that you can use JSeq. It is assumed that you have already downloaded JSeq from {{{http://www.edge.co.th}Edge Software}}. In order to generate sequence diagrams for ArgoUML, you must also have nsuml.jar available on your system. You get this file when you download ArgoUML.
+
+Installation
+
+        [[1]] Extract JSeq from the compressed download archive.
+
+        [[2]] Set the environment variable JSEQ_HOME to the name of the directory where you extracted JSeq.
+
+        [[3]] To make it easier to use JSeq from the command line, you can set your path to include JSEQ_HOME/bin.
+
+        [[4]] If you want to generate ArgoUML diagrams, you must make sure that JSeq can find nsuml.jar. To do this, either copy the file to JSEQ_HOME/lib, or set your CLASSPATH to include it.
+
+        To verify your installation, and to get acquainted with JSeq, please work through the {{{tutorial.html}tutorial}}.

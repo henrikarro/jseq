@@ -1,0 +1,117 @@
+<project name="JSeq Samples" default="main" basedir=".">
+
+  <!-- Use "${env.FOO}" to access environment variable FOO. -->
+  <property environment="env"/>
+
+  <!-- Source folders -->
+  <property name="src.dir" value="src"/>
+  <property name="main.src.dir" value="${src.dir}/main"/>
+  <property name="test.src.dir" value="${src.dir}/test"/>	
+
+  <!-- Class folders -->
+  <property name="build.dir" value="build"/> 
+  <property name="build.classes" value="${build.dir}/classes"/>
+  <property name="test.classes" value="${build.dir}/testcases"/>
+  
+  <!-- JSeq jars -->
+  <property name="jseq.lib.dir" value="${env.JSEQ_HOME}/lib"/>
+
+  <!-- Debug flag, set to "on" or "off" -->
+  <property name="debug" value="on"/>
+
+  <!-- Type of diagram to create, set to "argouml", "svg" or "text" -->
+  <property name="jseq.format" value="svg"/>
+
+  <!-- File to save diagram in -->
+  <property name="jseq.outfile" value="${basedir}/scenarios.svg"/>
+
+
+  <!-- ===================== -->
+  <!-- Classpath definitions -->
+  <!-- ===================== -->
+
+  <path id="base.class.path">
+    <pathelement path="${java.class.path}"/>
+    <pathelement path="${build.classes}"/>
+  </path>
+
+  <path id="test.class.path">
+    <pathelement path="${test.classes}"/>
+    <path refid="base.class.path"/>
+  </path>
+
+  <path id="jseq.class.path">
+    <path refid="test.class.path"/>
+    <fileset dir="${jseq.lib.dir}">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
+
+  <!-- ==================== -->
+  <!-- Target definitions   -->
+  <!-- ==================== -->
+
+  <target name="main" depends="prerequisites,make_diagram"/>
+
+  <target name="init">
+    <available classname="th.co.edge.jseq.Main"
+      classpathref="jseq.class.path"
+      property="has.jseq"/>
+    <available classname="ru.novosoft.uml.MBase"
+      classpathref="jseq.class.path"
+      property="has.nsuml"/>
+  </target>
+
+  <target name="check_jseq" depends="init" unless="has.jseq">
+    <fail message="Cannot find JSeq. Please set the JSEQ_HOME environment correctly."/>
+  </target>
+
+  <target name="check_nsuml" depends="init" unless="has.nsuml">
+    <fail message="Cannot find NSUML. Please download nsuml.jar from http://sourceforge.net/projects/nsuml/ and put it in the classpath, or under JSEQ_HOME/lib."/>
+  </target>
+
+  <target name="prerequisites" depends="check_jseq,check_nsuml"/>
+
+  <target name="compile" depends="compile_java"/>
+
+  <target name="compile_java">
+    <mkdir dir="${build.classes}"/>
+    <javac srcdir="${main.src.dir}"
+      destdir="${build.classes}"
+      debug="${debug}">
+      <include name="**/*.java"/>
+      <exclude name="**/CVS/Base/*"/>
+      <classpath refid="base.class.path"/>
+    </javac>
+  </target>
+
+  <target name="compile_tests" depends="compile">
+    <mkdir dir="${test.classes}"/>
+    <javac srcdir="${test.src.dir}" destdir="${test.classes}" debug="on">
+      <include name="**/*.java"/>
+      <exclude name="**/CVS/Base/*"/>
+      <classpath refid="test.class.path"/>
+    </javac>
+  </target>
+
+  <target name="make_diagram" depends="compile_tests">
+    <java fork="yes"
+      classname="th.co.edge.jseq.Main"
+      taskname="JSeq" failonerror="true">
+      <arg line="-format ${jseq.format}"/>
+      <arg line="-out ${jseq.outfile}"/>
+      <arg line="junit.textui.TestRunner"/>
+      <arg line="scenarios.AllScenarios"/>
+      <classpath refid="jseq.class.path"/>
+    </java>
+  </target>
+  
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+    <delete>
+      <fileset dir="." includes="scenarios.*"/>
+    </delete>
+  </target>
+
+</project>

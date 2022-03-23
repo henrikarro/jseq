@@ -1,0 +1,135 @@
+<html>
+  <head>
+    <title>JSeq Tutorial</title>
+  </head>
+
+  <body>
+    <table width="500">
+      <h1>JSeq Tutorial</h1>
+      <p>
+	This tutorial is a hands-on introduction to JSeq. All sample code can be found in the <code>samples</code> directory.
+      </p>
+
+      <!--
+      =====================
+      Using JSeq with JUnit
+      =====================
+      -->
+
+      <h2>Using JSeq with JUnit</h2>
+      <p>
+	The first step in our tutorial is to generate some diagrams based on JUnit test cases.
+      </p>
+      <p>
+	To do this, first set the environment variable JSEQ_HOME to the directory where you installed JSeq. Then run Ant on the <code>build.xml</code> file in the <code>samples</code> directory. This should compile the code and run JSeq.
+      </p>
+      <p>
+	The result should be an ArgoUML file called <code>scenarios.zargo</code> in the <code>samples</code> directory. Open it with ArgoUML. It contains a number of collaborations, one for each thread in every scenario, and one for setting up the JUnit tests.
+      </p>
+      <p>
+	Please compare the sequence diagrams to the source code. You will notice some peculiarities:
+	<ul>
+	  <li>The method names are not in the right place. Click on one of the method names to correct this.</li>
+	  <li>Calls back to the same object are not visibile as arrows; only the method name is shown. This seems to be a problem with ArgoUML 0.12, one that I will try to fix.
+	</ul>
+      </p>
+      <p>
+	To create SVG diagrams, change the <code>jseq.format</code> to <code>svg</code>, and the <code>jseq.outfile</code> to some appropriate file. Then run Ant again.
+      </p>
+
+      <!--
+      ======================
+      Using JSeq Stand-Alone
+      ======================
+      -->
+
+      <h2>Using JSeq Stand-Alone</h2>
+      <p>
+	The next step in this tutorial is to experiment with different command-line options.
+      </p>
+      <p>
+	First of all, set up your classpath so that you can run the class files in the directory <code>samples/build/classes</code>. Verify by giving the command
+	<pre>
+  java simple.Foo
+	</pre>
+	You should see no output; in particular, you should not see a <code>ClassNotFoundException</code>.
+      </p>
+      <p>
+	Now give the command
+	<pre>
+  jseq -save simple.sav -quiet simple.Foo
+	</pre>
+	This runs <code>simple.Foo</code>, saving a trace of the run in the file <code>simple.sav</code>, without generating any sequence diagram.
+      </p>
+      <p>
+	Now generate a textual representation of the previous run:
+	<pre>
+  jseq -read simple.sav -format text
+	</pre>
+	This will produce a list of all top-level activations (method calls) in the program run. In this case, there is only one top-level activation, the call to <code>simple.Foo.main</code>. Nested activations are shown indented.
+      </p>
+      <p>
+	Now for something more interesting: let's run JSeq on itself!
+	<pre>
+  jseq -save metasimple.sav -quiet th.co.edge.jseq.Main -read simple.sav -format text
+	</pre>
+	This runs JSeq's main class, <code>th.co.edge.jseq.Main</code>, saving the program trace in the file <code>metasimple.sav</code>. No sequence diagram is generated. Please be patient &mdash; on my machine, this JSeq run takes more than three minutes.
+      </p>
+      <p>
+	Now, if we look at the textual representation of the run:
+	<pre>
+  jseq -read metasimple.sav -format text
+	</pre>
+	we see that there are too many activations to produce any useful sequence diagram. Sure, JSeq <em>can</em> produce a diagram for this, but no human will want to look at it!
+      </p>
+      <p>
+	To produce something useful from this mass of information, we can do two things: select appropriate starting points for our diagram; and cut away unnessesary information.
+      </p>
+      <p>
+	If you take a look at the textual dump of all activations, you see that the method <code>th.co.edge.jseq.Formatter$TextFormatter.format</code> is called near the end. Let's say that we are interested in generating a sequence diagram for just this part of the program:
+	<pre>
+  jseq -read metasimple.sav -start th.co.edge.jseq.Formatter$TextFormatter.format \
+    -format svg -out metasimple.svg
+	</pre>
+	This creates an SVG diagram, starting from the given method call. If you open the diagram using some SVG viewer, you see that the diagram is still quite large.
+      </p>
+      <p>
+	The next thing we can do to reduce the diagram size is to cut away method calls that we are not interested in:
+	<pre>
+  jseq -read metasimple.sav -start th.co.edge.jseq.Formatter$TextFormatter.format \
+    -exclude *.getClassName -exclude *.getMethodName -format svg -out metasimple.svg 
+	</pre>
+	This produces a diagram without any calls to <code>getClassName</code> and <code>getMethodName</code>.
+      </p>
+      <p>
+	The <code>-exclude</code> flag can also be used to prune complete packages. For example, if you don't want to see any log4j calls, you would use <code>-exclude org.apache.log4j.*</code>. 
+      </p>
+
+      <!--
+      ==========================
+      Speeding Up JSeq Execution
+      ==========================
+      -->
+
+      <h2>Speeding Up JSeq Execution</h2>
+      <p>
+	As you saw when you ran JSeq on itself in the previous section, JSeq can take a long time to run. If we know beforehand which part of the program trace we are interested in, we can use the <code>-start</code> and <code>-exclude</code> flags to speed up program execution.
+      </p>
+      <p>
+	In the previous section, we generated a complete program trace, saved it to a file, and later pruned the sequence diagram. Of course, this does not make JSeq run faster. However, if we generate the program trace for only the part we are interested, it <i>will</i> run faster:
+      </p>
+      <pre>
+  jseq -start th.co.edge.jseq.Formatter$TextFormatter.format \
+    -exclude *.getClassName -exclude *.getMethodName -format svg -out metasimple2.svg \
+    th.co.edge.jseq.Main -read simple.sav -format text
+      </pre>
+      On my machine, this runs more than six times faster than generating the complete program trace.
+      </p>
+    </table>
+    <hr/>
+    <p align="center">
+      Copyright &copy; 2003, <a href="http://www.edge.co.th">Edge Software Co., Ltd.</a><br/>
+      All Rights Reserved
+    </p>
+  </body>
+</html>
